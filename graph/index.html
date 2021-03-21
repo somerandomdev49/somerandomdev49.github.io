@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.css" integrity="sha384-t5CR+zwDAROtph0PXGte6ia8heboACF9R5l/DiY+WZ3P2lxNgvJkQk5n7GPvLMYw" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.13.0/dist/katex.min.js" integrity="sha384-FaFLTlohFghEIZkw6VGwmf9ISTubWAVYW8tG8+w2LAIftJEULZABrF9PPFv+tVkH" crossorigin="anonymous"></script>
+    <script src="asciimath2tex.umd.js"></script>
+    <title>PLOTTER</title>
+</head>
+<body>  
+    <style>
+        body, html { padding:0;margin:0;width:100%;height:100%; }  
+        #parent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: min-content;
+        }
+        
+        #header {
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            left: 0;
+            z-index: 2;
+            margin: 5px;
+            color: #aaa;
+            text-align: center;
+        }
+
+        canvas {
+            image-rendering: pixelated;
+            border: 1px solid #000;
+        }
+        
+        .slider {
+            width: 100%;
+            margin-top: 0.5em;
+        }
+
+        .sliderl {
+            float: left;
+            border: 1px solid #000;
+            background-color: #fff;
+            aspect-ratio: 1 / 1;
+        }
+
+        .sliderr {
+            float: right;
+            border: 1px solid #000;
+            background-color: #fff;
+            aspect-ratio: 1 / 1;
+        }
+        
+        #func {
+            margin-top: 2em;
+        }
+
+        #input {
+            width: calc(100% - 4px);
+            margin-bottom: 1em;
+            padding: 1px 1px;
+            border: 1px solid #000;
+        }
+
+        .input-error {
+            background-color: #e89;
+        }
+    </style>
+    <div id="header">graph viewer - somerandomdev49</div>
+    
+    <div id="parent">
+        <input type="text" id="input">
+        <canvas id="canvas" width=300 height=300></canvas>
+        <div class="slider">
+            <button class="sliderl" id="scale-dec">&lt;</button>
+            <span class="sliderv" id="scale"></span>
+            <button class="sliderr" id="scale-inc">&gt;</button>
+        </div>
+        <div id="func"></div>
+    </div>
+    <script defer>
+        const Q = q => document.querySelector(q);
+        const E = f => e => { const v = f(e); update(); return v; };
+
+        const scaleElement = {
+            value: Q("#scale"),
+            inc: Q("#scale-inc"),
+            dec: Q("#scale-dec"),
+        };
+
+        scaleElement.inc.onclick = E(_ => SCALE++);
+        scaleElement.dec.onclick = E(_ => SCALE--);
+
+        const inputElement = Q("#input");
+        inputElement.oninput = E(_ => {
+            const oldF = f;
+            try {
+                
+                if(inputElement.value.trim()[0] == '!') {
+                    f = eval(inputElement.value.trim().substring(1));
+                } else {
+                    f = new Function("x", `"use strict";return(${inputElement.value});`);
+                    f.toString = function() {
+                        return `=> ${inputElement.value}`;
+                    };
+                }
+                inputElement.classList.remove("input-error");
+            } catch(e) {
+                inputElement.classList.add("input-error");
+                f = oldF;
+                throw e;
+            }
+        });
+
+        const canvas = Q("#canvas");
+        const ctx = canvas.getContext("2d");
+        let SCALE = 40;
+        let STEP = 0.1;
+        let SEPARATOR = 5;
+        let LIMIT = 50;
+        const scale = ([x, y]) => [x * SCALE, y * SCALE];
+        const point = ([x, y]) =>
+            [x + canvas.width / 2, canvas.height / 2 - y];
+        
+        const plot = ip => {
+            const sp = scale(ip); 
+            const [x, y] = point(sp);
+            // console.log(x, y);
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, 2 * Math.PI, false);
+            ctx.fillStyle = 'black';
+            ctx.fill();
+            ctx.closePath();
+            return ip;
+        }
+
+        const separatorH = ip => {
+            const sp = scale(ip); 
+            const [x, y] = point(sp);
+
+            ctx.strokeStyle = "#aaa";
+            ctx.beginPath();
+            ctx.moveTo(x, y - SEPARATOR);
+            ctx.lineTo(x, y + SEPARATOR);
+            ctx.stroke();
+        }
+
+        const separatorV = ip => {
+            const sp = scale(ip); 
+            const [x, y] = point(sp);
+
+            ctx.strokeStyle = "#aaa";
+            ctx.beginPath();
+            ctx.moveTo(x - SEPARATOR, y);
+            ctx.lineTo(x + SEPARATOR, y);
+            ctx.stroke();
+        }
+
+        const lineH = (color, iy) => {
+            const sp = scale([0, iy]); 
+            const [,y] = point(sp);
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+            return y;
+        };
+
+        const lineV = (color, ix) => {
+            const sp = scale([ix, 0]); 
+            const [x,] = point(sp);
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+            return x;
+        };
+
+        const graph = () => {
+           lineV("#aaa", 0);
+           lineH("#aaa", 0);
+
+            for(let x = -LIMIT; x <= LIMIT; ++x) {
+                const px = lineV("#eee", x);
+                if(px < 0 || px > canvas.width)
+                    continue;
+                separatorH([x,  0]);
+            }
+            for(let y = -LIMIT; y <= LIMIT; ++y) {
+                const py = lineH("#eee", y);
+                if(py < 0 || py < canvas.height)
+                    continue;
+                
+                separatorV([0, y]);
+            }
+        }
+
+        const conditional = (...vals) => {
+            const value = (x => {
+                for(const val of vals)
+                    if(val[1](x))
+                        return val[0](x);
+                return NaN;
+            });
+            value.toString = function() {
+                const v =  '=> {' + vals.map(v => 
+                    '(' + funp(v[0]) + ', ' +
+                    funp(v[1]).replace(/true/, 'otherwise') + ')') + ':}';
+                console.log(v);
+                return v;
+            }
+            return value;
+        }
+        
+
+        // x<−5?−x−7:−2⋅x 2−12⋅x−12
+        let f = conditional(
+            [ x => - x - 7, x => x < -5 ],
+            [ x => -2 * x ** 2 - 12 * x - 12, _ => true ],
+        );
+
+        const functionReplacers = {
+            '\\*\\*': '^',
+        }
+
+        const asciiMathParser = new AsciiMathParser();
+        const funp = f => {
+            s = f.toString().split('=>')[1].trim().replace(/Math\./g, '');
+            for(const [k, v] of Object.entries(functionReplacers)) {
+                s = s.replace(new RegExp(k, 'g'), v);
+            }
+            return s;
+        }
+        
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            graph();
+            for(let x = -LIMIT; x <= LIMIT; x += STEP) {
+                const y = f(x);
+                const [px, py] = plot([x, y]);
+                if(px < 0 || px > canvas.width || py < 0 || py < canvas.height)
+                    continue;
+            }
+        }
+
+        function update() {
+            scaleElement.value.innerText = SCALE;
+            draw();
+            katex.render(asciiMathParser.parse("f(x) = " + funp(f)), Q("#func"));
+        }
+
+        update();
+    </script>
+</body>
+</html>

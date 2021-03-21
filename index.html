@@ -1,15 +1,170 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>SomeRandomDev49</title>
-    <script src="./node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+<head>
+	<meta charset="utf-8">
+	<title>SomeRandomDev49</title>
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,400,500" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital@1&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="github-markdown.css">
+	<script src="https://unpkg.com/json5@^2.0.0/dist/index.min.js"></script>
+	<style>
+		html {
+			--color-purple: rgb(191, 90, 242);
+			--color-blue: rgb(10, 123, 255);
+		}
+		
+		.markdown-body {
+			font-family: "Roboto";
+			box-sizing: border-box;
+			min-width: 200px;
+			max-width: 980px;
+			margin: 0 auto;
+			padding: 45px;
+		}
 
-    <!-- Your application must load the Roboto and Material Icons fonts. -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
-  </head>
-  <body>
-    hi, i'm somerandomdev49 :D
-  </body>
+		.center-align {
+			text-align: center;
+		}
+
+		code {
+			font-family: "Roboto Mono";
+		}
+
+		.a {
+			color: black !important;
+			        text-decoration: underline dotted black !important;
+			-webkit-text-decoration: underline dotted black;
+			cursor: help;
+		}
+		
+		@media (max-width: 767px) {
+			.markdown-body {
+				padding: 15px;
+			}
+		}
+
+		i.flare-func::after {
+			display: inline-block;
+			content: 'f';
+			font-family: "DM Mono";
+			margin: 0.5em;
+			color: var(--color-purple);
+		}
+
+		i.flare-class::after {
+			display: inline-block;
+			content: 'c';
+			font-family: "DM Mono";
+			margin: 0.5em;
+			color: var(--color-blue);
+		}
+
+		label {
+			display: block;
+			font-style: italic;
+			margin-top: 1em;
+		}
+
+		.doc-title {
+			margin-top: 0.5em !important;
+		}
+
+		.doc-body {
+			margin-left: 2em;
+		}
+
+		.doc-value {
+			margin-left: 1em;
+		}
+
+		.title-note {
+			height: 100%;
+			color: gray;
+			font-style: normal;
+			font-weight: normal;
+			font-size: 10pt;
+			float: right;
+			vertical-align: middle;
+		}
+	</style>
+</head>
+<body class="markdown-body">
+	<i>hi, i'm somerandomdev49 :D</i><br/>
+	<h2>My projects:</h2>
+	<ul>
+		<li><a href="https://github.com/somerandomdev49/">github</a></li>
+		<li><a href="graph/index.html">a graphing tool</a></li>
+	</ul>
+	
+	<h2>How to use:</h2>
+	<h3>Github</h3>
+	<p>
+		You can browse the repos
+		<a href="https://github.com/somerandomdev49?tab=repositories">here</a>.
+		<br>
+		Click on one of them and star it (hehehe)
+	</p>
+	<h3>Graphing tool</h3>
+	<p>
+		The top rectangle is the input field.<br>
+		Equasions are entered as a js expression, with the only variable x.
+		For example:<br>
+		<pre>x ** x + 3 - Math.sin(3 * x)</pre>
+		If you begin with a bang (<code>!</code>), you can enter as just js.
+		In this case, the input is expected to be a function:<br>
+		<pre>!<a class="a" href="#conditional">conditional</a>([ x =&gt; - x - 7, x => x &lt; -5 ], [ x =&gt; -2 * x ** 2 - 12 * x - 12, _ =&gt; true ]);</pre>
+		You can also enter this:<br>
+		<pre>!x => x * x</pre><br>
+		<blockquote>
+			You can only use <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">ES6 arrow functions</a>, so <code>!x => x</code> is allowed,
+			but <code>!function myFunc(x) { return x; }</code> is not!
+		</blockquote>
+		Bottom arrows change the scale.
+	</p>
+	<h2>Documentation<div class="title-note">this was generated from <a href="docs.json5">a json5 file</a></div></h2>
+	<div id="docs"></div>
+	
+	<script defer>
+		main();
+		const stringToHTML = html => {
+			const doc = document.createElement("template");
+			doc.innerHTML = html.trim();
+			return doc.content.firstChild;
+		};
+		async function main() {
+			const docsReq = await fetch("./docs.json5");
+			const docsText = await docsReq.text();
+			const docs = JSON5.parse(docsText);
+
+			function generateDoc(doc, props) {
+				const elem = document.createElement("p");
+				elem.appendChild(stringToHTML(`<h4 id="${doc}" class="doc-title"><i class="flare-${props.type}"></i>${doc}</h4>`));
+				const bodyElem = stringToHTML(`<div class="doc-body"></div>`);
+				for(const [k, v] of Object.entries(props.docs)) {
+					bodyElem.appendChild(stringToHTML(`<label>${k}:</label>`));
+					bodyElem.appendChild(stringToHTML(`<div class="doc-value"><${v.type}>${v.value}</${v.type}></div>`));
+				}
+				elem.appendChild(bodyElem);
+				return elem;
+			}
+
+			function generateDocs(root, docs) {
+				for(const [k, v] of Object.entries(docs)) {
+					const elem = document.createElement('div');
+					elem.appendChild(stringToHTML(`<h3>${k}</h3>`));
+					const categoryElem = document.createElement('div');
+					for(const [g, w] of Object.entries(v)) {
+						categoryElem.appendChild(generateDoc(g, w));
+					}
+					root.appendChild(elem);
+					root.appendChild(categoryElem);
+				}
+			}
+
+			generateDocs(document.querySelector("#docs"), docs);
+		}
+	</script>
+</body>
 </html>
