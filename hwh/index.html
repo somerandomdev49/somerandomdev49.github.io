@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Homework Helper</title>
+</head>
+<body>
+	<style>
+		.font-monospace {
+			font-family: monospace;
+		}
+
+		main {
+			padding: 3em;
+			padding-right: 0px;
+			overflow-x: hidden;
+		}
+
+		.font-monospace input {
+			border: none;
+			font-family: monospace;
+			width: 6em;
+		}
+	</style>
+
+	<main>
+		<div>
+			<h3>Solve quadractic</h3>
+			<div class="font-monospace">
+				a: <input id="_S-q-a" type="number" value="1" oninput="sU_q();"><br/>
+				b: <input id="_S-q-b" type="number" value="0" oninput="sU_q();"><br/>
+				c: <input id="_S-q-c" type="number" value="0" oninput="sU_q();"><br/>
+				D: <span id="_S-q--D"></span><br/>
+				A: <span id="_S-q--A"></span><br/>
+			</div>
+		</div>
+	</main>
+
+	<script>
+		const Q = document.querySelector.bind(document);
+
+		const E = {
+			q: {
+				a: Q("#_S-q-a"),
+				b: Q("#_S-q-b"),
+				c: Q("#_S-q-c"),
+				D: Q("#_S-q--D"),
+				A: Q("#_S-q--A")
+			}
+		};
+
+		function sU_q() {
+			const a = Number.parseFloat(E.q.a.value);
+			const b = Number.parseFloat(E.q.b.value);
+			const c = Number.parseFloat(E.q.c.value);
+			
+			const D = b ** 2 - 4 * a * c;
+			const sD_v = [4,a,c].map(Math.abs).filter(x=>x!=1)
+			const sD_s = a*c < 0 ? '+' : '-';
+			const sD = `${b ** 2} ${sD_s} ${sD_v.join(' · ')}`;
+
+			let A;
+			/**/ if(D  < 0) A = [`none`];
+			else if(D == 0) A = [-b / a];
+			else if(D  > 0) A = [(-b + Math.sqrt(D)) / a, (-b - Math.sqrt(D)) / a];
+			else            A = [`err`];
+
+			E.q.D.innerText = `${sD} = ${D}`;
+			E.q.A.innerText = A.join(', ');
+		}
+
+		sU_q();
+	</script>
+</body>
+</html>
