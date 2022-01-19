@@ -65,7 +65,7 @@
 			let A;
 			/**/ if(D  < 0) A = [`none`];
 			else if(D == 0) A = [-b / a2];
-			else if(D  > 0) A = [(-b + Math.sqrt(D)) / a2, (-b - Math.sqrt(D)) / a2];
+			else if(D  > 0) A = [(-b + Math.sqrt(D)) / a2, (-b - Math.sqrt(D)) / a2].sort((a,b)=>a-b);
 			else            A = [`err`];
 
 			E.q.D.innerText = `${sD} = ${D}`;
