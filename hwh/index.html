@@ -55,6 +55,7 @@
 			const a = Number.parseFloat(E.q.a.value);
 			const b = Number.parseFloat(E.q.b.value);
 			const c = Number.parseFloat(E.q.c.value);
+			const a2 = a * 2;
 			
 			const D = b ** 2 - 4 * a * c;
 			const sD_v = [4,a,c].map(Math.abs).filter(x=>x!=1)
@@ -63,8 +64,8 @@
 
 			let A;
 			/**/ if(D  < 0) A = [`none`];
-			else if(D == 0) A = [-b / a];
-			else if(D  > 0) A = [(-b + Math.sqrt(D)) / a, (-b - Math.sqrt(D)) / a];
+			else if(D == 0) A = [-b / a2];
+			else if(D  > 0) A = [(-b + Math.sqrt(D)) / a2, (-b - Math.sqrt(D)) / a2];
 			else            A = [`err`];
 
 			E.q.D.innerText = `${sD} = ${D}`;
