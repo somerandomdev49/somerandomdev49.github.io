@@ -84,6 +84,7 @@
 			const sQ_sc = [a,b,c].map(c=>c==1?``:Math.abs(c));
 			const sQs = [`${sQ_sc[0]}x²`,`${sQ_s[1]} ${sQ_sc[1]}x`,`${sQ_s[2]} ${sQ_sc[2]}`];
 			const sQ = sQs.filter((_,i)=>[a,b,c][i]!=0).join(' ');
+			const a2 = a * 2;
 			
 			const D = b ** 2 - 4 * a * c;
 			const sD_v = [4,a,c].map(Math.abs).filter(x=>x!=1);
@@ -92,8 +93,8 @@
 
 			let A;
 			/**/ if(D  < 0) A = [`none`];
-			else if(D == 0) A = [-b / a];
-			else if(D  > 0) A = [(-b + Math.sqrt(D)) / a, (-b - Math.sqrt(D)) / a];
+			else if(D == 0) A = [-b / a2];
+			else if(D  > 0) A = [(-b + Math.sqrt(D)) / a2, (-b - Math.sqrt(D)) / a2].sort((a,b)=>a-b);
 			else            A = [`err`];
 
 			E.q.Q.innerText = `${sQ}`;
