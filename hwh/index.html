@@ -21,20 +21,40 @@
 		.font-monospace input {
 			border: none;
 			font-family: monospace;
+			background-color: transparent;
 			width: 6em;
+		}
+
+		.font-monospace select {
+			border: none;
+			font-family: monospace;
+			width: 6em;
+			background-color: transparent;
 		}
 	</style>
 
 	<main>
 		<div>
-			<h3>Solve quadractic</h3>
+			<h3>Solve quadratic</h3>
 			<div class="font-monospace">
+				Q: <span id="_S-q--Q"></span><br/>
 				a: <input id="_S-q-a" type="number" value="1" oninput="sU_q();"><br/>
 				b: <input id="_S-q-b" type="number" value="0" oninput="sU_q();"><br/>
 				c: <input id="_S-q-c" type="number" value="0" oninput="sU_q();"><br/>
 				D: <span id="_S-q--D"></span><br/>
 				A: <span id="_S-q--A"></span><br/>
+				
+				f: <select id="_S-q-f" oninput="sU_q();">
+					<option value="no">&emptyset;</option>
+					<option value="gt">&gt;</option>
+					<option value="lt">&lt;</option>
+					<option value="ge">&ge;</option>
+					<option value="le">&le;</option>
+				</select><br/>
+				x &isin; <span id="_S-q--X"></span><br/>
+				<canvas id="_S-q--E" width="400" height="50"></canvas>
 			</div>
+
 		</div>
 	</main>
 
@@ -43,11 +63,15 @@
 
 		const E = {
 			q: {
+				Q: Q("#_S-q--Q"),
 				a: Q("#_S-q-a"),
 				b: Q("#_S-q-b"),
 				c: Q("#_S-q-c"),
+				f: Q("#_S-q-f"),
 				D: Q("#_S-q--D"),
-				A: Q("#_S-q--A")
+				A: Q("#_S-q--A"),
+				X: Q("#_S-q--A"),
+				E: Q("#_S-q--e"),
 			}
 		};
 
@@ -55,9 +79,14 @@
 			const a = Number.parseFloat(E.q.a.value);
 			const b = Number.parseFloat(E.q.b.value);
 			const c = Number.parseFloat(E.q.c.value);
+
+			const sQ_s = [a,b,c].map(x=>x>0?'+':'-');
+			const sQ_sc = [a,b,c].map(c=>c==1?``:Math.abs(c));
+			const sQs = [`${sQ_sc[0]}x²`,`${sQ_s[1]} ${sQ_sc[1]}x`,`${sQ_s[2]} ${sQ_sc[2]}`];
+			const sQ = sQs.filter((_,i)=>[a,b,c][i]!=0).join(' ');
 			
 			const D = b ** 2 - 4 * a * c;
-			const sD_v = [4,a,c].map(Math.abs).filter(x=>x!=1)
+			const sD_v = [4,a,c].map(Math.abs).filter(x=>x!=1);
 			const sD_s = a*c < 0 ? '+' : '-';
 			const sD = `${b ** 2} ${sD_s} ${sD_v.join(' · ')}`;
 
@@ -67,6 +96,7 @@
 			else if(D  > 0) A = [(-b + Math.sqrt(D)) / a, (-b - Math.sqrt(D)) / a];
 			else            A = [`err`];
 
+			E.q.Q.innerText = `${sQ}`;
 			E.q.D.innerText = `${sD} = ${D}`;
 			E.q.A.innerText = A.join(', ');
 		}
