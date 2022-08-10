@@ -102,19 +102,19 @@
 	<h3>Graphing tool</h3>
 	<p>
 		The top rectangle is the input field.<br>
-		Equasions are entered as a js expression, with the only variable x.
+		Equations are entered as a JavaScript expression, with the a single variable x.
 		For example:<br>
 		<pre>x ** x + 3 - Math.sin(3 * x)</pre>
-		If you begin with a bang (<code>!</code>), you can enter as just js.
+		If you begin with a bang (<code>!</code>), you can enter plain JavaScript.
 		In this case, the input is expected to be a function:<br>
 		<pre>!<a class="a" href="#conditional">conditional</a>([ x =&gt; - x - 7, x => x &lt; -5 ], [ x =&gt; -2 * x ** 2 - 12 * x - 12, _ =&gt; true ]);</pre>
-		You can also enter this:<br>
+		You can also enter this for example:<br>
 		<pre>!x => x * x</pre><br>
 		<blockquote>
 			You can only use <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">ES6 arrow functions</a>, so <code>!x => x</code> is allowed,
 			but <code>!function myFunc(x) { return x; }</code> is not!
 		</blockquote>
-		Bottom arrows change the scale.
+		Arrows at the bottom change the scale.
 	</p>
 	<h2>Documentation<div class="title-note">this was generated from <a href="docs.json5">a json5 file</a></div></h2>
 	<div id="docs"></div>
